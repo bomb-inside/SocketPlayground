@@ -22,6 +22,7 @@ namespace SocketPlayground
         }
         private void Form1_Load(object sender, EventArgs e)
         {
+            /*
             try
             {
                 Socket mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -29,8 +30,24 @@ namespace SocketPlayground
             }
             catch (Exception ex)
             {
-                // delegate 써서 오류 내용 표시해보기
-                MessageBox.Show("연결에 실패했습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // 연결 실패 : ex.Message 형태로 표시해보기 - delegate 사용?
+                string errorMsg = "연결 실패 : " + ex.Message;
+                MessageBox.Show(errorMsg, "알림", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }*/
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+                int[] arr = new int[2];
+                arr[100] = 1;
+            }
+            catch (Exception ex)
+            {
+                // 연결 실패 : ex.Message 형태로 표시해보기 - delegate 사용?
+                string errorMsg = "연결 실패 : " + ex.Message;
+                MessageBox.Show(errorMsg, "알림", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
