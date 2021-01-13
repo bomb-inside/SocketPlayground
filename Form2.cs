@@ -28,47 +28,38 @@ namespace SocketPlayground
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string bindIP = textBox1.Text;
-            int bindPort = Int32.Parse(textBox2.Text);
-            string serverIP = textBox3.Text;
-            int serverPort = Int32.Parse(textBox4.Text);
-            string message = textBox5.Text;
+            clientRun();
+        }
 
+        private async void clientRun()
+        {
+            var clientTask = Task.Run(() => RunClient());
+            await clientTask;
+        }
+
+        private void RunClient()
+        {
             try
             {
-                IPEndPoint clientAddress = new IPEndPoint(IPAddress.Parse(bindIP), bindPort);
-                IPEndPoint serverAddress = new IPEndPoint(IPAddress.Parse(serverIP), serverPort);
+                UdpClient cli = new UdpClient();
 
-                label1.Text = String.Format("클라이언트 : {0}, {1}", clientAddress, serverAddress);
+                string msg = textBox1.Text;
+                byte[] datagram = Encoding.UTF8.GetBytes(msg);
+                cli.Send(datagram, datagram.Length, "192.168.0.78", 7777);
+                label1.Text = "[Send] 192.168.0.78:7777로 " + datagram.Length + "바이트 전송";
 
-                TcpClient client = new TcpClient(clientAddress);
+                IPEndPoint epRemote = new IPEndPoint(IPAddress.Any, 0);
+                byte[] bytes = cli.Receive(ref epRemote);
+                label2.Text = "[Receive] " + epRemote.ToString() + "로부터 " + bytes.Length + "바이트 수신";
+                label3.Text = Encoding.UTF8.GetString(bytes);
 
-                client.Connect(serverAddress);
-
-                byte[] data = Encoding.Default.GetBytes(message);
-
-                NetworkStream stream = client.GetStream();
-
-                stream.Write(data, 0, data.Length);
-                label2.Text = String.Format("송신 : {0}", message);
-
-                data = new byte[256];
-                string responseData = "";
-
-                int bytes = stream.Read(data, 0, data.Length);
-                responseData = Encoding.Default.GetString(data, 0, bytes);
-                label3.Text = String.Format("수신 : {0}", responseData);
-
-                stream.Close();
-                client.Close();
+                cli.Close();
             }
             catch (SocketException se)
             {
                 string errorMsg = "소켓 에러 : " + se.Message;
                 MessageBox.Show(errorMsg, "알림", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            label1.Text = "클라이언트를 종료합니다.";
         }
     }
 }
